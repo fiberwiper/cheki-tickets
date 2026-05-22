@@ -482,17 +482,36 @@ function deleteTicket() {
 }
 
 // ── Settings ──
-function openSettings() { renderSettings(); document.getElementById('settings-overlay').classList.add('open'); }
-function closeSettings() { document.getElementById('settings-overlay').classList.remove('open'); render(); }
-function bgCloseSettings(e) { if (e.target === document.getElementById('settings-overlay')) closeSettings(); }
+let editingItem = null; // { lt, idx }
 
 function getList(lt)    { return lt === 'groups' ? loadGroups() : loadTypes(); }
 function setList(lt, d) { lt === 'groups' ? saveGroups(d) : saveTypes(d); }
+
+function openSettings()  { editingItem = null; renderSettings(); document.getElementById('settings-overlay').classList.add('open'); }
+function closeSettings() { editingItem = null; document.getElementById('settings-overlay').classList.remove('open'); render(); }
+function bgCloseSettings(e) { if (e.target === document.getElementById('settings-overlay')) closeSettings(); }
 
 function renderSettings() {
   document.getElementById('settings-body').innerHTML =
     buildSettingsSection('groups', 'グループ', loadGroups()) +
     buildSettingsSection('types',  '種別',     loadTypes());
+  // If editing, replace that row with input
+  if (editingItem) {
+    const { lt, idx } = editingItem;
+    const items = getList(lt);
+    const row   = document.getElementById(`srow-${lt}-${idx}`);
+    if (row && items[idx] !== undefined) {
+      row.innerHTML = `
+        <input id="setting-edit-input" type="text" value="${esc(items[idx])}"
+          style="flex:1;border:1px solid var(--primary);border-radius:8px;padding:8px 10px;font-size:15px;outline:none;margin-right:6px">
+        <div class="setting-acts">
+          <button class="s-btn confirm" onclick="confirmEdit()">✓</button>
+          <button class="s-btn" onclick="cancelEdit()">✕</button>
+        </div>`;
+      const inp = document.getElementById('setting-edit-input');
+      if (inp) { inp.focus(); inp.select(); }
+    }
+  }
 }
 
 function buildSettingsSection(lt, label, items) {
@@ -505,7 +524,7 @@ function buildSettingsSection(lt, label, items) {
         <div class="setting-acts">
           <button class="s-btn${first?' ghost':''}" onclick="moveItem('${lt}',${i},-1)">↑</button>
           <button class="s-btn${last?' ghost':''}"  onclick="moveItem('${lt}',${i}, 1)">↓</button>
-          <button class="s-btn" onclick="editItem('${lt}',${i})">✎</button>
+          <button class="s-btn" onclick="startEdit('${lt}',${i})">✎</button>
           <button class="s-btn danger" onclick="deleteItem('${lt}',${i})">🗑</button>
         </div>
       </div>`;
@@ -513,7 +532,7 @@ function buildSettingsSection(lt, label, items) {
   return `
     <div class="settings-section">
       <h3>${label}</h3>
-      <div id="slist-${lt}">${rows || '<div style="color:#bbb;font-size:14px;padding:8px 0">まだありません</div>'}</div>
+      <div>${rows || '<div style="color:#bbb;font-size:14px;padding:8px 0">まだありません</div>'}</div>
       <div class="setting-add-row">
         <input type="text" id="sadd-${lt}" placeholder="${label}を追加">
         <button onclick="addItem('${lt}')">追加</button>
@@ -521,7 +540,31 @@ function buildSettingsSection(lt, label, items) {
     </div>`;
 }
 
+function startEdit(lt, idx) {
+  editingItem = { lt, idx };
+  renderSettings();
+}
+
+function confirmEdit() {
+  if (!editingItem) return;
+  const inp = document.getElementById('setting-edit-input');
+  const val = inp ? inp.value.trim() : '';
+  if (!val) { alert('名前を入力してください'); return; }
+  const { lt, idx } = editingItem;
+  const items = getList(lt);
+  items[idx] = val;
+  setList(lt, items);
+  editingItem = null;
+  renderSettings();
+}
+
+function cancelEdit() {
+  editingItem = null;
+  renderSettings();
+}
+
 function moveItem(lt, idx, dir) {
+  editingItem = null;
   const items = getList(lt);
   const ni = idx + dir;
   if (ni < 0 || ni >= items.length) return;
@@ -530,41 +573,15 @@ function moveItem(lt, idx, dir) {
 }
 
 function deleteItem(lt, idx) {
+  editingItem = null;
   const items = getList(lt);
   if (!confirm(`「${items[idx]}」を削除しますか？\n（既存チケットのデータはそのまま残ります）`)) return;
   items.splice(idx, 1);
   setList(lt, items); renderSettings();
 }
 
-function editItem(lt, idx) {
-  const items = getList(lt);
-  const row   = document.getElementById(`srow-${lt}-${idx}`);
-  row.innerHTML = `
-    <input type="text" value="${esc(items[idx])}"
-      style="flex:1;border:1px solid var(--primary);border-radius:8px;padding:8px 10px;font-size:15px;outline:none;margin-right:6px">
-    <div class="setting-acts">
-      <button class="s-btn confirm" onclick="saveItem('${lt}',${idx},this)">✓</button>
-      <button class="s-btn" onclick="renderSettings()">✕</button>
-    </div>`;
-  const inp = row.querySelector('input');
-  inp.focus(); inp.select();
-  inp.addEventListener('keydown', e => {
-    if (e.key === 'Enter')  saveItem(lt, idx, row.querySelector('.confirm'));
-    if (e.key === 'Escape') renderSettings();
-  });
-}
-
-function saveItem(lt, idx, btn) {
-  const row = btn.closest('.setting-row');
-  const inp = row && row.querySelector('input');
-  const val = inp ? inp.value.trim() : '';
-  if (!val) { alert('名前を入力してください'); return; }
-  const items = getList(lt);
-  items[idx] = val;
-  setList(lt, items); renderSettings();
-}
-
 function addItem(lt) {
+  editingItem = null;
   const inp = document.getElementById(`sadd-${lt}`);
   const val = inp.value.trim();
   if (!val) return;
