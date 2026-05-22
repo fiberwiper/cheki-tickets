@@ -47,7 +47,7 @@ header h1 { font-size: 20px; font-weight: 700; color: var(--primary); }
 .card.warn  { border-left: 4px solid var(--danger); }
 .card.stale { opacity: 0.5; border-left: 4px solid #bbb; }
 .card-info { flex: 1; min-width: 0; }
-.card-member { font-size: 12px; color: #888; margin-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-member { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .card-type   { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .card-sub    { font-size: 12px; color: #aaa; margin-top: 3px; }
 .card-sub.soon   { color: var(--danger); font-weight: 600; }
@@ -62,14 +62,14 @@ header h1 { font-size: 20px; font-weight: 700; color: var(--primary); }
 .card-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
 .btn-use {
   background: var(--success); color: #fff; border: none;
-  border-radius: 8px; padding: 5px 10px;
-  font-size: 12px; font-weight: 600; cursor: pointer;
+  border-radius: 10px; padding: 9px 14px;
+  font-size: 14px; font-weight: 600; cursor: pointer;
 }
 .btn-use:disabled { background: #ccc; cursor: default; }
 .btn-edit {
   background: none; border: 1px solid #e5e5e5;
-  border-radius: 8px; padding: 5px 8px;
-  font-size: 12px; cursor: pointer; color: #555;
+  border-radius: 10px; padding: 9px 12px;
+  font-size: 14px; cursor: pointer; color: #555;
 }
 .used-toggle-row {
   padding: 12px 20px 6px; display: flex; align-items: center;
@@ -196,7 +196,7 @@ header h1 { font-size: 20px; font-weight: 700; color: var(--primary); }
     </div>
     <div class="field">
       <label>枚数</label>
-      <input type="number" id="f-count" min="1" value="1">
+      <select id="f-count"></select>
     </div>
     <div class="field">
       <label>期限日</label>
@@ -306,7 +306,7 @@ function render() {
         const label  = d === null ? '' : expired ? `期限切れ（${Math.abs(d)}日前）` : d === 0 ? '今日まで！' : `あと${d}日`;
         const memberLine = t.member
           ? `<div class="card-member">${esc(t.member)}</div>`
-          : `<div class="card-member" style="color:#007aff99">グループ共通</div>`;
+          : `<div class="card-member" style="color:#007aff;font-weight:400;font-size:13px">グループ共通</div>`;
         html += `
           <div class="${cls}">
             <div class="card-info">
@@ -314,7 +314,7 @@ function render() {
               <div class="card-type">${esc(t.type)}</div>
               <div class="${subCls}">${fmtDate(t.expiry)}${label ? `（${label}）` : ''}</div>
             </div>
-            <div class="badge">${t.count}枚</div>
+            <div class="badge">${t.count}</div>
             <div class="card-actions">
               <button class="btn-use" onclick="useOne('${t.id}')"${expired?' disabled':''}>使う</button>
               <button class="btn-edit" onclick="openModal('${t.id}')">✎</button>
@@ -434,6 +434,10 @@ function openModal(id) {
     document.getElementById('f-count').value  = '1';
     document.getElementById('f-expiry').value = '';
   }
+
+  // Build count select
+  const countSel = document.getElementById('f-count');
+  countSel.innerHTML = Array.from({length:30}, (_,i) => `<option value="${i+1}">${i+1}</option>`).join('');
 
   onGroupChange(); onTypeChange();
   document.getElementById('overlay').classList.add('open');
