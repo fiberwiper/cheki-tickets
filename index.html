@@ -552,8 +552,17 @@ function confirmEdit() {
   if (!val) { alert('名前を入力してください'); return; }
   const { lt, idx } = editingItem;
   const items = getList(lt);
+  const oldVal = items[idx];
   items[idx] = val;
   setList(lt, items);
+  // 既存チケットの該当フィールドも一括更新
+  const field = lt === 'groups' ? 'group' : 'type';
+  const tickets = load();
+  let changed = false;
+  for (const t of tickets) {
+    if (t[field] === oldVal) { t[field] = val; changed = true; }
+  }
+  if (changed) save(tickets);
   editingItem = null;
   renderSettings();
 }
