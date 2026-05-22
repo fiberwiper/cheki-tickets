@@ -22,8 +22,10 @@ header {
 header h1 { font-size: 20px; font-weight: 700; color: var(--primary); }
 .header-btns { display: flex; gap: 10px; align-items: center; }
 .icon-btn {
-  background: none; border: none; font-size: 20px;
-  cursor: pointer; color: var(--primary); padding: 2px;
+  background: #e8f0fe; border: none;
+  border-radius: 50%; width: 36px; height: 36px;
+  font-size: 20px; cursor: pointer; color: var(--primary);
+  display: flex; align-items: center; justify-content: center;
 }
 .add-btn {
   background: var(--primary); color: #fff; border: none;
@@ -59,7 +61,7 @@ header h1 { font-size: 20px; font-weight: 700; color: var(--primary); }
   min-width: 40px; text-align: center; flex-shrink: 0;
 }
 .badge.dim { background: #bbb; }
-.card-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+.card-actions { display: flex; flex-direction: row; align-items: center; gap: 8px; flex-shrink: 0; }
 .btn-use {
   background: var(--success); color: #fff; border: none;
   border-radius: 10px; padding: 9px 14px;
@@ -314,8 +316,8 @@ function render() {
               <div class="card-type">${esc(t.type)}</div>
               <div class="${subCls}">${fmtDate(t.expiry)}${label ? `（${label}）` : ''}</div>
             </div>
-            <div class="badge">${t.count}</div>
             <div class="card-actions">
+              <div class="badge">${t.count}</div>
               <button class="btn-use" onclick="useOne('${t.id}')"${expired?' disabled':''}>使う</button>
               <button class="btn-edit" onclick="openModal('${t.id}')">✎</button>
             </div>
