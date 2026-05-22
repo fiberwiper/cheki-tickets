@@ -6,60 +6,54 @@
 <title>Cheki Tickets</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --primary: #007aff; --danger: #ff3b30; --success: #34c759; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
-  background: #f5f5f7;
-  color: #1d1d1f;
-  max-width: 520px;
-  margin: 0 auto;
-  min-height: 100vh;
-  padding-bottom: 48px;
+  background: #f5f5f7; color: #1d1d1f;
+  max-width: 520px; margin: 0 auto;
+  min-height: 100vh; padding-bottom: 48px;
 }
 header {
-  background: #fff;
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  background: #fff; padding: 16px 20px;
+  display: flex; align-items: center; justify-content: space-between;
   border-bottom: 1px solid #e5e5e5;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  position: sticky; top: 0; z-index: 10;
 }
-header h1 { font-size: 20px; font-weight: 700; color: #e8506a; }
+header h1 { font-size: 20px; font-weight: 700; color: var(--primary); }
+.header-btns { display: flex; gap: 10px; align-items: center; }
+.icon-btn {
+  background: none; border: none; font-size: 20px;
+  cursor: pointer; color: var(--primary); padding: 2px;
+}
 .add-btn {
-  background: #e8506a; color: #fff; border: none;
+  background: var(--primary); color: #fff; border: none;
   border-radius: 50%; width: 36px; height: 36px;
   font-size: 24px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
 }
-
-/* Group header */
 .group-header {
-  padding: 20px 20px 8px;
-  font-size: 13px; font-weight: 700;
-  color: #e8506a; letter-spacing: 0.05em;
-  border-bottom: 1px solid #f0d0d5;
+  padding: 16px 20px 8px;
+  font-size: 13px; font-weight: 700; color: var(--primary);
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #d0e4ff;
   margin: 0 12px 8px;
 }
-
-/* Card */
 .card {
   background: #fff; margin: 0 12px 8px;
   border-radius: 12px; padding: 12px 14px;
   display: flex; align-items: center; gap: 12px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
-.card.warn  { border-left: 4px solid #ff3b30; }
+.card.warn  { border-left: 4px solid var(--danger); }
 .card.stale { opacity: 0.5; border-left: 4px solid #bbb; }
 .card-info { flex: 1; min-width: 0; }
 .card-member { font-size: 12px; color: #888; margin-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .card-type   { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .card-sub    { font-size: 12px; color: #aaa; margin-top: 3px; }
-.card-sub.soon   { color: #ff3b30; font-weight: 600; }
+.card-sub.soon   { color: var(--danger); font-weight: 600; }
 .card-sub.passed { color: #bbb; }
 .badge {
-  background: #e8506a; color: #fff;
+  background: var(--primary); color: #fff;
   border-radius: 20px; padding: 4px 10px;
   font-size: 14px; font-weight: 700;
   min-width: 40px; text-align: center; flex-shrink: 0;
@@ -67,7 +61,7 @@ header h1 { font-size: 20px; font-weight: 700; color: #e8506a; }
 .badge.dim { background: #bbb; }
 .card-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
 .btn-use {
-  background: #34c759; color: #fff; border: none;
+  background: var(--success); color: #fff; border: none;
   border-radius: 8px; padding: 5px 10px;
   font-size: 12px; font-weight: 600; cursor: pointer;
 }
@@ -77,8 +71,6 @@ header h1 { font-size: 20px; font-weight: 700; color: #e8506a; }
   border-radius: 8px; padding: 5px 8px;
   font-size: 12px; cursor: pointer; color: #555;
 }
-
-/* Used toggle */
 .used-toggle-row {
   padding: 12px 20px 6px; display: flex; align-items: center;
   gap: 6px; cursor: pointer; user-select: none;
@@ -88,7 +80,7 @@ header h1 { font-size: 20px; font-weight: 700; color: #e8506a; }
 .used-section.open { display: block; }
 .empty { text-align: center; color: #bbb; padding: 48px 20px; font-size: 15px; line-height: 1.8; }
 
-/* Modal */
+/* Modal shared */
 .overlay {
   display: none; position: fixed; inset: 0;
   background: rgba(0,0,0,0.45); z-index: 100;
@@ -106,35 +98,61 @@ header h1 { font-size: 20px; font-weight: 700; color: #e8506a; }
 .field input, .field select {
   width: 100%; border: 1px solid #e5e5e5; border-radius: 10px;
   padding: 10px 12px; font-size: 16px; outline: none;
-  background: #fafafa; -webkit-appearance: none; appearance: none;
-  color: #1d1d1f;
+  background: #fafafa; -webkit-appearance: none; appearance: none; color: #1d1d1f;
 }
-.field input:focus, .field select:focus { border-color: #e8506a; }
+.field input:focus, .field select:focus { border-color: var(--primary); }
 .field input:disabled { background: #f0f0f0; color: #aaa; }
-
-/* Month-end quick buttons */
 .month-btns { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
 .month-btn {
   background: #f2f2f7; border: none; border-radius: 8px;
-  padding: 6px 10px; font-size: 12px; cursor: pointer; color: #555;
-  white-space: nowrap;
+  padding: 6px 10px; font-size: 12px; cursor: pointer; color: #555; white-space: nowrap;
 }
-.month-btn.active { background: #e8506a; color: #fff; }
-
+.month-btn.active { background: var(--primary); color: #fff; }
 .modal-btns { display: flex; gap: 10px; margin-top: 6px; }
 .btn-cancel {
   flex: 1; background: #f2f2f7; border: none;
   border-radius: 12px; padding: 14px; font-size: 15px; cursor: pointer; color: #555;
 }
 .btn-save {
-  flex: 2; background: #e8506a; border: none;
+  flex: 2; background: var(--primary); border: none;
   border-radius: 12px; padding: 14px; font-size: 15px;
   font-weight: 700; color: #fff; cursor: pointer;
 }
 .btn-delete {
   display: none; width: 100%; background: none; border: none;
-  color: #ff3b30; font-size: 13px; cursor: pointer;
+  color: var(--danger); font-size: 13px; cursor: pointer;
   padding: 14px 0 0; text-align: center;
+}
+
+/* Settings */
+.settings-section { margin-bottom: 24px; }
+.settings-section h3 {
+  font-size: 13px; font-weight: 700; color: #888;
+  text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px;
+}
+.setting-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 0; border-bottom: 1px solid #f0f0f0;
+}
+.setting-name { flex: 1; font-size: 15px; }
+.setting-acts { display: flex; gap: 4px; flex-shrink: 0; }
+.s-btn {
+  background: none; border: 1px solid #e5e5e5; border-radius: 6px;
+  padding: 4px 8px; font-size: 13px; cursor: pointer; color: #555; min-width: 30px;
+}
+.s-btn.danger { color: var(--danger); border-color: #ffd0ce; }
+.s-btn.ghost  { opacity: 0.25; pointer-events: none; }
+.s-btn.confirm { color: var(--primary); border-color: #b0d4ff; }
+.setting-add-row { display: flex; gap: 8px; margin-top: 12px; }
+.setting-add-row input {
+  flex: 1; border: 1px solid #e5e5e5; border-radius: 10px;
+  padding: 9px 12px; font-size: 15px; outline: none; background: #fafafa;
+}
+.setting-add-row input:focus { border-color: var(--primary); }
+.setting-add-row button {
+  background: var(--primary); color: #fff; border: none;
+  border-radius: 10px; padding: 9px 16px; font-size: 14px;
+  font-weight: 600; cursor: pointer; white-space: nowrap;
 }
 </style>
 </head>
@@ -142,7 +160,10 @@ header h1 { font-size: 20px; font-weight: 700; color: #e8506a; }
 
 <header>
   <h1>🎫 Cheki Tickets</h1>
-  <button class="add-btn" onclick="openModal()">+</button>
+  <div class="header-btns">
+    <button class="icon-btn" onclick="openSettings()">⚙︎</button>
+    <button class="add-btn" onclick="openModal()">+</button>
+  </div>
 </header>
 
 <div id="active-area"></div>
@@ -155,44 +176,28 @@ header h1 { font-size: 20px; font-weight: 700; color: #e8506a; }
   <div class="used-section" id="used-list"></div>
 </div>
 
+<!-- Ticket form modal -->
 <div class="overlay" id="overlay" onclick="bgClose(event)">
   <div class="modal">
     <h2 id="modal-title">チケットを追加</h2>
-
     <div class="field">
       <label>グループ名</label>
       <select id="f-group" onchange="onGroupChange()"></select>
-      <input type="text" id="f-group-new" placeholder="新しいグループ名を入力" style="display:none; margin-top:8px">
+      <input type="text" id="f-group-new" placeholder="新しいグループ名" style="display:none;margin-top:8px">
     </div>
-
     <div class="field">
       <label>メンバー名（空白＝グループ共通）</label>
-      <input type="text" id="f-member" placeholder="例：ことり（共通チケットは空白）">
+      <input type="text" id="f-member" placeholder="例：ことり（共通なら空白）">
     </div>
-
     <div class="field">
       <label>種別</label>
-      <select id="f-type" onchange="onTypeChange()">
-        <option value="チェキ券">チェキ券</option>
-        <option value="サインチェキ券">サインチェキ券</option>
-        <option value="サイン券">サイン券</option>
-        <option value="写メ券">写メ券</option>
-        <option value="動画券">動画券</option>
-        <option value="ポイント">ポイント</option>
-        <option value="その他">その他…</option>
-      </select>
+      <select id="f-type" onchange="onTypeChange()"></select>
+      <input type="text" id="f-type-new" placeholder="新しい種別名" style="display:none;margin-top:8px">
     </div>
-
-    <div class="field" id="field-custom" style="display:none">
-      <label>種別（カスタム）</label>
-      <input type="text" id="f-custom" placeholder="例：宿題チェキ">
-    </div>
-
     <div class="field">
       <label>枚数</label>
       <input type="number" id="f-count" min="1" value="1">
     </div>
-
     <div class="field">
       <label>期限日</label>
       <input type="date" id="f-expiry">
@@ -203,7 +208,6 @@ header h1 { font-size: 20px; font-weight: 700; color: #e8506a; }
         <button class="month-btn" id="btn-noexp" onclick="toggleNoExpiry()">期限なし</button>
       </div>
     </div>
-
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
       <button class="btn-save" onclick="saveTicket()">保存</button>
@@ -212,14 +216,35 @@ header h1 { font-size: 20px; font-weight: 700; color: #e8506a; }
   </div>
 </div>
 
+<!-- Settings modal -->
+<div class="overlay" id="settings-overlay" onclick="bgCloseSettings(event)">
+  <div class="modal">
+    <h2>設定</h2>
+    <div id="settings-body"></div>
+    <div class="modal-btns" style="margin-top:0">
+      <button class="btn-cancel" onclick="closeSettings()">閉じる</button>
+    </div>
+  </div>
+</div>
+
 <script>
-const KEY = 'cheki_tickets';
+const KEY        = 'cheki_tickets';
+const GROUPS_KEY = 'cheki_groups';
+const TYPES_KEY  = 'cheki_types';
+const DEFAULT_TYPES = ['チェキ券','サインチェキ券','サイン券','写メ券','動画券','ポイント'];
+
 let editingId = null;
-let noExpiry = false;
+let noExpiry  = false;
 
-function load() { return JSON.parse(localStorage.getItem(KEY) || '[]'); }
-function save(d) { localStorage.setItem(KEY, JSON.stringify(d)); }
+// ── Storage ──
+function load()        { return JSON.parse(localStorage.getItem(KEY)        || '[]'); }
+function save(d)       { localStorage.setItem(KEY, JSON.stringify(d)); }
+function loadGroups()  { return JSON.parse(localStorage.getItem(GROUPS_KEY) || '[]'); }
+function saveGroups(d) { localStorage.setItem(GROUPS_KEY, JSON.stringify(d)); }
+function loadTypes()   { const s = localStorage.getItem(TYPES_KEY); return s ? JSON.parse(s) : [...DEFAULT_TYPES]; }
+function saveTypes(d)  { localStorage.setItem(TYPES_KEY, JSON.stringify(d)); }
 
+// ── Helpers ──
 function daysLeft(exp) {
   if (!exp) return null;
   const t = new Date(); t.setHours(0,0,0,0);
@@ -229,9 +254,7 @@ function daysLeft(exp) {
 function fmtDate(s) {
   if (!s) return '期限なし';
   const d = new Date(s);
-  return d.getFullYear() + '/' +
-    String(d.getMonth()+1).padStart(2,'0') + '/' +
-    String(d.getDate()).padStart(2,'0');
+  return d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
 }
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -239,17 +262,16 @@ function esc(s) {
 function monthEnd(offset) {
   const d = new Date();
   d.setMonth(d.getMonth() + offset + 1, 0);
-  return d.getFullYear() + '-' +
-    String(d.getMonth() + 1).padStart(2, '0') + '-' +
-    String(d.getDate()).padStart(2, '0');
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
+// ── Main render ──
 function render() {
-  const data = load();
-  const active = data.filter(t => !t.used);
-  const used   = data.filter(t =>  t.used);
+  const data       = load();
+  const active     = data.filter(t => !t.used);
+  const used       = data.filter(t =>  t.used);
+  const groupOrder = loadGroups();
 
-  // Sort active: null expiry last, then by expiry asc
   active.sort((a, b) => {
     if (!a.expiry && !b.expiry) return 0;
     if (!a.expiry) return 1;
@@ -257,42 +279,40 @@ function render() {
     return a.expiry.localeCompare(b.expiry);
   });
 
-  // (group select is populated in openModal)
-
-  // Group active by group name
   const grouped = {};
   for (const t of active) {
     const g = t.group || '（グループ未設定）';
     if (!grouped[g]) grouped[g] = [];
     grouped[g].push(t);
   }
+  const sortedGroups = [
+    ...groupOrder.filter(g => grouped[g]),
+    ...Object.keys(grouped).filter(g => !groupOrder.includes(g))
+  ];
 
   const activeArea = document.getElementById('active-area');
   if (active.length === 0) {
     activeArea.innerHTML = '<div class="empty">チケットがありません<br>＋ボタンで追加できます</div>';
   } else {
     let html = '';
-    for (const [gname, tickets] of Object.entries(grouped)) {
+    for (const gname of sortedGroups) {
       html += `<div class="group-header">${esc(gname)}</div>`;
-      for (const t of tickets) {
-        const d = daysLeft(t.expiry);
+      for (const t of grouped[gname]) {
+        const d       = daysLeft(t.expiry);
         const expired = d !== null && d < 0;
         const soon    = d !== null && !expired && d <= 30;
-        const cls     = expired ? 'card stale' : soon ? 'card warn' : 'card';
-        const subCls  = expired ? 'card-sub passed' : soon ? 'card-sub soon' : 'card-sub';
-        const label   = d === null ? '期限なし'
-          : expired ? `期限切れ（${Math.abs(d)}日前）`
-          : d === 0 ? '今日まで！'
-          : `あと${d}日`;
+        const cls    = expired ? 'card stale' : soon ? 'card warn' : 'card';
+        const subCls = expired ? 'card-sub passed' : soon ? 'card-sub soon' : 'card-sub';
+        const label  = d === null ? '' : expired ? `期限切れ（${Math.abs(d)}日前）` : d === 0 ? '今日まで！' : `あと${d}日`;
         const memberLine = t.member
           ? `<div class="card-member">${esc(t.member)}</div>`
-          : `<div class="card-member" style="color:#e8506a88">グループ共通</div>`;
+          : `<div class="card-member" style="color:#007aff99">グループ共通</div>`;
         html += `
           <div class="${cls}">
             <div class="card-info">
               ${memberLine}
               <div class="card-type">${esc(t.type)}</div>
-              <div class="${subCls}">${fmtDate(t.expiry)}${d !== null ? `（${label}）` : ''}</div>
+              <div class="${subCls}">${fmtDate(t.expiry)}${label ? `（${label}）` : ''}</div>
             </div>
             <div class="badge">${t.count}枚</div>
             <div class="card-actions">
@@ -305,7 +325,6 @@ function render() {
     activeArea.innerHTML = html;
   }
 
-  // Used
   const usedWrap = document.getElementById('used-wrap');
   const usedList = document.getElementById('used-list');
   if (used.length === 0) {
@@ -315,7 +334,7 @@ function render() {
     usedList.innerHTML = used.map(t => `
       <div class="card stale">
         <div class="card-info">
-          <div class="card-member" style="color:#aaa">${esc(t.group)}${t.member ? ' / ' + esc(t.member) : ' / 共通'}</div>
+          <div class="card-member" style="color:#aaa">${esc(t.group)}${t.member?' / '+esc(t.member):' / 共通'}</div>
           <div class="card-type">${esc(t.type)}</div>
           <div class="card-sub passed">使用済み</div>
         </div>
@@ -327,6 +346,7 @@ function render() {
   }
 }
 
+// ── Ticket use ──
 function useOne(id) {
   const data = load();
   const t = data.find(x => x.id === id);
@@ -336,72 +356,68 @@ function useOne(id) {
   save(data); render();
 }
 
+// ── Form helpers ──
 function setMonthEnd(offset) {
   noExpiry = false;
   document.getElementById('btn-noexp').classList.remove('active');
   document.getElementById('f-expiry').disabled = false;
   document.getElementById('f-expiry').value = monthEnd(offset);
 }
-
 function toggleNoExpiry() {
   noExpiry = !noExpiry;
   document.getElementById('btn-noexp').classList.toggle('active', noExpiry);
   document.getElementById('f-expiry').disabled = noExpiry;
   if (noExpiry) document.getElementById('f-expiry').value = '';
 }
-
 function onGroupChange() {
   const v = document.getElementById('f-group').value;
-  const newInput = document.getElementById('f-group-new');
-  newInput.style.display = v === '__new__' ? 'block' : 'none';
-  if (v === '__new__') newInput.focus();
+  const el = document.getElementById('f-group-new');
+  el.style.display = v === '__new__' ? 'block' : 'none';
+  if (v === '__new__') el.focus();
 }
-
 function onTypeChange() {
   const v = document.getElementById('f-type').value;
-  document.getElementById('field-custom').style.display = v === 'その他' ? 'block' : 'none';
+  const el = document.getElementById('f-type-new');
+  el.style.display = v === '__new__' ? 'block' : 'none';
+  if (v === '__new__') el.focus();
+}
+function buildSelect(selId, items, currentVal) {
+  const sel = document.getElementById(selId);
+  sel.innerHTML = items.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('')
+    + `<option value="__new__">＋ 新規追加…</option>`;
+  if (currentVal && items.includes(currentVal)) {
+    sel.value = currentVal;
+  } else if (currentVal) {
+    sel.innerHTML = `<option value="${esc(currentVal)}">${esc(currentVal)}</option>` + sel.innerHTML;
+    sel.value = currentVal;
+  } else if (items.length > 0) {
+    sel.value = items[0];
+  } else {
+    sel.value = '__new__';
+  }
 }
 
+// ── Ticket modal ──
 function openModal(id) {
   editingId = id || null;
-  noExpiry = false;
+  noExpiry  = false;
   document.getElementById('btn-noexp').classList.remove('active');
   document.getElementById('f-expiry').disabled = false;
   document.getElementById('modal-title').textContent = id ? 'チケットを編集' : 'チケットを追加';
   document.getElementById('btn-delete').style.display = id ? 'block' : 'none';
-  document.getElementById('field-custom').style.display = 'none';
   document.getElementById('f-group-new').style.display = 'none';
+  document.getElementById('f-type-new').style.display  = 'none';
 
-  // Populate group select
-  const allGroups = [...new Set(load().map(t => t.group).filter(Boolean))];
-  const groupSel = document.getElementById('f-group');
-  groupSel.innerHTML = allGroups.map(g => `<option value="${esc(g)}">${esc(g)}</option>`).join('')
-    + `<option value="__new__">＋ 新しいグループ…</option>`;
+  const groups = loadGroups();
+  const types  = loadTypes();
 
   if (id) {
     const t = load().find(x => x.id === id);
     if (t) {
-      // If the group exists in the list, select it; otherwise add it
-      if (allGroups.includes(t.group)) {
-        groupSel.value = t.group;
-      } else if (t.group) {
-        groupSel.innerHTML = `<option value="${esc(t.group)}">${esc(t.group)}</option>` + groupSel.innerHTML;
-        groupSel.value = t.group;
-      }
+      buildSelect('f-group', groups, t.group);
+      buildSelect('f-type',  types,  t.type);
       document.getElementById('f-member').value = t.member || '';
       document.getElementById('f-count').value  = t.count;
-      // Type
-      const sel = document.getElementById('f-type');
-      const knownTypes = ['チェキ券','サインチェキ券','サイン券','写メ券','動画券','ポイント'];
-      if (knownTypes.includes(t.type)) {
-        sel.value = t.type;
-        document.getElementById('f-custom').value = '';
-      } else {
-        sel.value = 'その他';
-        document.getElementById('f-custom').value = t.type || '';
-        document.getElementById('field-custom').style.display = 'block';
-      }
-      // Expiry
       if (!t.expiry) {
         noExpiry = true;
         document.getElementById('btn-noexp').classList.add('active');
@@ -412,41 +428,36 @@ function openModal(id) {
       }
     }
   } else {
-    if (allGroups.length > 0) groupSel.value = allGroups[0];
+    buildSelect('f-group', groups, null);
+    buildSelect('f-type',  types,  null);
     document.getElementById('f-member').value = '';
-    document.getElementById('f-type').value   = 'チェキ券';
-    document.getElementById('f-custom').value = '';
     document.getElementById('f-count').value  = '1';
     document.getElementById('f-expiry').value = '';
   }
-  onGroupChange();
-  document.getElementById('overlay').classList.add('open');
-  document.getElementById('f-group').focus();
-}
 
+  onGroupChange(); onTypeChange();
+  document.getElementById('overlay').classList.add('open');
+}
 function closeModal() {
   document.getElementById('overlay').classList.remove('open');
   editingId = null;
 }
-function bgClose(e) {
-  if (e.target === document.getElementById('overlay')) closeModal();
-}
+function bgClose(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
 
 function saveTicket() {
-  const groupSel = document.getElementById('f-group').value;
-  const group  = groupSel === '__new__'
-    ? document.getElementById('f-group-new').value.trim()
-    : groupSel.trim();
+  const gSel  = document.getElementById('f-group').value;
+  const group = gSel === '__new__' ? document.getElementById('f-group-new').value.trim() : gSel;
+  const tSel  = document.getElementById('f-type').value;
+  const type  = tSel === '__new__' ? document.getElementById('f-type-new').value.trim() : tSel;
   const member = document.getElementById('f-member').value.trim();
-  const typeVal = document.getElementById('f-type').value;
-  const type   = typeVal === 'その他'
-    ? document.getElementById('f-custom').value.trim()
-    : typeVal;
   const count  = Math.max(1, parseInt(document.getElementById('f-count').value) || 1);
   const expiry = noExpiry ? null : (document.getElementById('f-expiry').value || null);
 
   if (!group) { alert('グループ名を入力してください'); return; }
   if (!type)  { alert('種別を入力してください'); return; }
+
+  if (gSel === '__new__') { const gs = loadGroups(); if (!gs.includes(group)) { gs.push(group); saveGroups(gs); } }
+  if (tSel === '__new__') { const ts = loadTypes();  if (!ts.includes(type))  { ts.push(type);  saveTypes(ts);  } }
 
   const data = load();
   if (editingId) {
@@ -465,11 +476,104 @@ function deleteTicket() {
   closeModal(); render();
 }
 
+// ── Settings ──
+function openSettings() { renderSettings(); document.getElementById('settings-overlay').classList.add('open'); }
+function closeSettings() { document.getElementById('settings-overlay').classList.remove('open'); render(); }
+function bgCloseSettings(e) { if (e.target === document.getElementById('settings-overlay')) closeSettings(); }
+
+function getList(lt)    { return lt === 'groups' ? loadGroups() : loadTypes(); }
+function setList(lt, d) { lt === 'groups' ? saveGroups(d) : saveTypes(d); }
+
+function renderSettings() {
+  document.getElementById('settings-body').innerHTML =
+    buildSettingsSection('groups', 'グループ', loadGroups()) +
+    buildSettingsSection('types',  '種別',     loadTypes());
+}
+
+function buildSettingsSection(lt, label, items) {
+  let rows = '';
+  for (let i = 0; i < items.length; i++) {
+    const first = i === 0, last = i === items.length - 1;
+    rows += `
+      <div class="setting-row" id="srow-${lt}-${i}">
+        <span class="setting-name">${esc(items[i])}</span>
+        <div class="setting-acts">
+          <button class="s-btn${first?' ghost':''}" onclick="moveItem('${lt}',${i},-1)">↑</button>
+          <button class="s-btn${last?' ghost':''}"  onclick="moveItem('${lt}',${i}, 1)">↓</button>
+          <button class="s-btn" onclick="editItem('${lt}',${i})">✎</button>
+          <button class="s-btn danger" onclick="deleteItem('${lt}',${i})">🗑</button>
+        </div>
+      </div>`;
+  }
+  return `
+    <div class="settings-section">
+      <h3>${label}</h3>
+      <div id="slist-${lt}">${rows || '<div style="color:#bbb;font-size:14px;padding:8px 0">まだありません</div>'}</div>
+      <div class="setting-add-row">
+        <input type="text" id="sadd-${lt}" placeholder="${label}を追加">
+        <button onclick="addItem('${lt}')">追加</button>
+      </div>
+    </div>`;
+}
+
+function moveItem(lt, idx, dir) {
+  const items = getList(lt);
+  const ni = idx + dir;
+  if (ni < 0 || ni >= items.length) return;
+  [items[idx], items[ni]] = [items[ni], items[idx]];
+  setList(lt, items); renderSettings();
+}
+
+function deleteItem(lt, idx) {
+  const items = getList(lt);
+  if (!confirm(`「${items[idx]}」を削除しますか？\n（既存チケットのデータはそのまま残ります）`)) return;
+  items.splice(idx, 1);
+  setList(lt, items); renderSettings();
+}
+
+function editItem(lt, idx) {
+  const items = getList(lt);
+  const row   = document.getElementById(`srow-${lt}-${idx}`);
+  row.innerHTML = `
+    <input type="text" id="sedit-${lt}-${idx}" value="${esc(items[idx])}"
+      style="flex:1;border:1px solid var(--primary);border-radius:8px;padding:6px 10px;font-size:14px;outline:none;margin-right:6px">
+    <div class="setting-acts">
+      <button class="s-btn confirm" onclick="saveItem('${lt}',${idx})">✓</button>
+      <button class="s-btn" onclick="renderSettings()">✕</button>
+    </div>`;
+  const inp = document.getElementById(`sedit-${lt}-${idx}`);
+  inp.focus(); inp.select();
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter')  saveItem(lt, idx);
+    if (e.key === 'Escape') renderSettings();
+  });
+}
+
+function saveItem(lt, idx) {
+  const inp = document.getElementById(`sedit-${lt}-${idx}`);
+  const val = inp ? inp.value.trim() : '';
+  if (!val) { alert('名前を入力してください'); return; }
+  const items = getList(lt);
+  items[idx] = val;
+  setList(lt, items); renderSettings();
+}
+
+function addItem(lt) {
+  const inp = document.getElementById(`sadd-${lt}`);
+  const val = inp.value.trim();
+  if (!val) return;
+  const items = getList(lt);
+  if (items.includes(val)) { alert('同じ名前がすでにあります'); return; }
+  items.push(val);
+  setList(lt, items);
+  inp.value = '';
+  renderSettings();
+}
+
+// ── Used toggle ──
 function toggleUsed() {
-  const sec = document.getElementById('used-list');
-  const chv = document.getElementById('chevron');
-  const open = sec.classList.toggle('open');
-  chv.textContent = open ? '▼' : '▶';
+  const open = document.getElementById('used-list').classList.toggle('open');
+  document.getElementById('chevron').textContent = open ? '▼' : '▶';
 }
 
 render();
