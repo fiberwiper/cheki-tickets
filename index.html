@@ -239,7 +239,9 @@ function esc(s) {
 function monthEnd(offset) {
   const d = new Date();
   d.setMonth(d.getMonth() + offset + 1, 0);
-  return d.toISOString().split('T')[0];
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
 }
 
 function render() {
@@ -417,6 +419,7 @@ function openModal(id) {
     document.getElementById('f-count').value  = '1';
     document.getElementById('f-expiry').value = '';
   }
+  onGroupChange();
   document.getElementById('overlay').classList.add('open');
   document.getElementById('f-group').focus();
 }
