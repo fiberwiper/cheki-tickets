@@ -161,8 +161,8 @@ header h1 { font-size: 20px; font-weight: 700; color: #e8506a; }
 
     <div class="field">
       <label>グループ名</label>
-      <input type="text" id="f-group" list="group-list" placeholder="例：ふりぼ">
-      <datalist id="group-list"></datalist>
+      <select id="f-group" onchange="onGroupChange()"></select>
+      <input type="text" id="f-group-new" placeholder="新しいグループ名を入力" style="display:none; margin-top:8px">
     </div>
 
     <div class="field">
@@ -255,9 +255,7 @@ function render() {
     return a.expiry.localeCompare(b.expiry);
   });
 
-  // Update datalist for group autocomplete
-  const groups = [...new Set(data.map(t => t.group).filter(Boolean))];
-  document.getElementById('group-list').innerHTML = groups.map(g => `<option value="${esc(g)}">`).join('');
+  // (group select is populated in openModal)
 
   // Group active by group name
   const grouped = {};
@@ -350,6 +348,13 @@ function toggleNoExpiry() {
   if (noExpiry) document.getElementById('f-expiry').value = '';
 }
 
+function onGroupChange() {
+  const v = document.getElementById('f-group').value;
+  const newInput = document.getElementById('f-group-new');
+  newInput.style.display = v === '__new__' ? 'block' : 'none';
+  if (v === '__new__') newInput.focus();
+}
+
 function onTypeChange() {
   const v = document.getElementById('f-type').value;
   document.getElementById('field-custom').style.display = v === 'その他' ? 'block' : 'none';
@@ -363,11 +368,24 @@ function openModal(id) {
   document.getElementById('modal-title').textContent = id ? 'チケットを編集' : 'チケットを追加';
   document.getElementById('btn-delete').style.display = id ? 'block' : 'none';
   document.getElementById('field-custom').style.display = 'none';
+  document.getElementById('f-group-new').style.display = 'none';
+
+  // Populate group select
+  const allGroups = [...new Set(load().map(t => t.group).filter(Boolean))];
+  const groupSel = document.getElementById('f-group');
+  groupSel.innerHTML = allGroups.map(g => `<option value="${esc(g)}">${esc(g)}</option>`).join('')
+    + `<option value="__new__">＋ 新しいグループ…</option>`;
 
   if (id) {
     const t = load().find(x => x.id === id);
     if (t) {
-      document.getElementById('f-group').value  = t.group  || '';
+      // If the group exists in the list, select it; otherwise add it
+      if (allGroups.includes(t.group)) {
+        groupSel.value = t.group;
+      } else if (t.group) {
+        groupSel.innerHTML = `<option value="${esc(t.group)}">${esc(t.group)}</option>` + groupSel.innerHTML;
+        groupSel.value = t.group;
+      }
       document.getElementById('f-member').value = t.member || '';
       document.getElementById('f-count').value  = t.count;
       // Type
@@ -392,7 +410,7 @@ function openModal(id) {
       }
     }
   } else {
-    document.getElementById('f-group').value  = '';
+    if (allGroups.length > 0) groupSel.value = allGroups[0];
     document.getElementById('f-member').value = '';
     document.getElementById('f-type').value   = 'チェキ券';
     document.getElementById('f-custom').value = '';
@@ -412,7 +430,10 @@ function bgClose(e) {
 }
 
 function saveTicket() {
-  const group  = document.getElementById('f-group').value.trim();
+  const groupSel = document.getElementById('f-group').value;
+  const group  = groupSel === '__new__'
+    ? document.getElementById('f-group-new').value.trim()
+    : groupSel.trim();
   const member = document.getElementById('f-member').value.trim();
   const typeVal = document.getElementById('f-type').value;
   const type   = typeVal === 'その他'
