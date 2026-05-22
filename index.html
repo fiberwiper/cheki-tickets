@@ -231,7 +231,7 @@ header h1 { font-size: 20px; font-weight: 700; color: var(--primary); }
 const KEY        = 'cheki_tickets';
 const GROUPS_KEY = 'cheki_groups';
 const TYPES_KEY  = 'cheki_types';
-const DEFAULT_TYPES = ['チェキ券','サインチェキ券','サイン券','写メ券','動画券','ポイント'];
+const DEFAULT_TYPES = ['チェキ券','サインチェキ券','写メ券','動画券'];
 
 let editingId = null;
 let noExpiry  = false;
@@ -372,14 +372,14 @@ function toggleNoExpiry() {
 function onGroupChange() {
   const v = document.getElementById('f-group').value;
   const el = document.getElementById('f-group-new');
-  el.style.display = v === '__new__' ? 'block' : 'none';
-  if (v === '__new__') el.focus();
+  if (v === '__new__') { el.value = ''; el.style.display = 'block'; el.focus(); }
+  else { el.style.display = 'none'; }
 }
 function onTypeChange() {
   const v = document.getElementById('f-type').value;
   const el = document.getElementById('f-type-new');
-  el.style.display = v === '__new__' ? 'block' : 'none';
-  if (v === '__new__') el.focus();
+  if (v === '__new__') { el.value = ''; el.style.display = 'block'; el.focus(); }
+  else { el.style.display = 'none'; }
 }
 function buildSelect(selId, items, currentVal) {
   const sel = document.getElementById(selId);
