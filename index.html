@@ -411,13 +411,17 @@ function openModal(id) {
   const groups = loadGroups();
   const types  = loadTypes();
 
+  // Build count select first so value can be set after
+  const countSel = document.getElementById('f-count');
+  countSel.innerHTML = Array.from({length:30}, (_,i) => `<option value="${i+1}">${i+1}</option>`).join('');
+
   if (id) {
     const t = load().find(x => x.id === id);
     if (t) {
       buildSelect('f-group', groups, t.group);
       buildSelect('f-type',  types,  t.type);
       document.getElementById('f-member').value = t.member || '';
-      document.getElementById('f-count').value  = t.count;
+      countSel.value = String(t.count);
       if (!t.expiry) {
         noExpiry = true;
         document.getElementById('btn-noexp').classList.add('active');
@@ -431,13 +435,9 @@ function openModal(id) {
     buildSelect('f-group', groups, null);
     buildSelect('f-type',  types,  null);
     document.getElementById('f-member').value = '';
-    document.getElementById('f-count').value  = '1';
+    countSel.value = '1';
     document.getElementById('f-expiry').value = '';
   }
-
-  // Build count select
-  const countSel = document.getElementById('f-count');
-  countSel.innerHTML = Array.from({length:30}, (_,i) => `<option value="${i+1}">${i+1}</option>`).join('');
 
   onGroupChange(); onTypeChange();
   document.getElementById('overlay').classList.add('open');
@@ -539,22 +539,23 @@ function editItem(lt, idx) {
   const items = getList(lt);
   const row   = document.getElementById(`srow-${lt}-${idx}`);
   row.innerHTML = `
-    <input type="text" id="sedit-${lt}-${idx}" value="${esc(items[idx])}"
-      style="flex:1;border:1px solid var(--primary);border-radius:8px;padding:6px 10px;font-size:14px;outline:none;margin-right:6px">
+    <input type="text" value="${esc(items[idx])}"
+      style="flex:1;border:1px solid var(--primary);border-radius:8px;padding:8px 10px;font-size:15px;outline:none;margin-right:6px">
     <div class="setting-acts">
-      <button class="s-btn confirm" onclick="saveItem('${lt}',${idx})">✓</button>
+      <button class="s-btn confirm" onclick="saveItem('${lt}',${idx},this)">✓</button>
       <button class="s-btn" onclick="renderSettings()">✕</button>
     </div>`;
-  const inp = document.getElementById(`sedit-${lt}-${idx}`);
+  const inp = row.querySelector('input');
   inp.focus(); inp.select();
   inp.addEventListener('keydown', e => {
-    if (e.key === 'Enter')  saveItem(lt, idx);
+    if (e.key === 'Enter')  saveItem(lt, idx, row.querySelector('.confirm'));
     if (e.key === 'Escape') renderSettings();
   });
 }
 
-function saveItem(lt, idx) {
-  const inp = document.getElementById(`sedit-${lt}-${idx}`);
+function saveItem(lt, idx, btn) {
+  const row = btn.closest('.setting-row');
+  const inp = row && row.querySelector('input');
   const val = inp ? inp.value.trim() : '';
   if (!val) { alert('名前を入力してください'); return; }
   const items = getList(lt);
