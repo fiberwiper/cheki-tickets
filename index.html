@@ -536,15 +536,20 @@ function buildBackupSection() {
     </div>`;
 }
 
-function exportData() {
+async function exportData() {
   const payload = {
     tickets: load(),
     groups:  loadGroups(),
     types:   loadTypes()
   };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const json = JSON.stringify(payload, null, 2);
+  const file = new File([json], 'cheki-tickets-backup.json', { type: 'application/json' });
+  if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: 'Cheki Tickets バックアップ' }); return; } catch {}
+  }
+  // fallback: ダウンロード
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
+  a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
   a.download = 'cheki-tickets-backup.json';
   a.click();
 }
