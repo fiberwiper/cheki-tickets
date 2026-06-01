@@ -525,53 +525,52 @@ function buildBackupSection() {
   return `
     <div class="settings-section">
       <h3>データのバックアップ</h3>
-      <p style="font-size:13px;color:#888;margin-bottom:12px;line-height:1.6">ホーム画面に追加し直すときは、先にエクスポートしてください。追加後にインポートすればデータが戻ります。</p>
-      <div style="display:flex;gap:8px">
-        <button onclick="exportData()" style="flex:1;background:#f2f2f7;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;color:#333">書き出す</button>
-        <label style="flex:1;background:var(--primary);border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;color:#fff;text-align:center;display:block">
-          読み込む
-          <input type="file" accept=".json" onchange="importData(event)" style="display:none">
-        </label>
+      <p style="font-size:13px;color:#888;margin-bottom:12px;line-height:1.6">ホーム画面に追加し直すときは、先に「コピー」してメモアプリ等に貼り付けて保存してください。追加後に「貼り付けて復元」でデータが戻ります。</p>
+      <button onclick="exportData()" style="width:100%;background:#f2f2f7;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;color:#333;margin-bottom:8px">データをコピー</button>
+      <button onclick="showImport()" style="width:100%;background:var(--primary);border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;color:#fff">貼り付けて復元</button>
+      <div id="import-area" style="display:none;margin-top:10px">
+        <textarea id="import-text" placeholder="コピーしたデータをここに貼り付けてください" style="width:100%;height:100px;border:1px solid #e5e5e5;border-radius:10px;padding:10px;font-size:13px;resize:none;outline:none"></textarea>
+        <button onclick="importData()" style="width:100%;background:var(--danger);border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;color:#fff;margin-top:6px">このデータで復元する</button>
       </div>
     </div>`;
 }
 
 async function exportData() {
-  const payload = {
-    tickets: load(),
-    groups:  loadGroups(),
-    types:   loadTypes()
-  };
-  const json = JSON.stringify(payload, null, 2);
-  const file = new File([json], 'cheki-tickets-backup.json', { type: 'application/json' });
-  if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-    try { await navigator.share({ files: [file], title: 'Cheki Tickets バックアップ' }); return; } catch {}
+  const payload = { tickets: load(), groups: loadGroups(), types: loadTypes() };
+  const json = JSON.stringify(payload);
+  try {
+    await navigator.clipboard.writeText(json);
+    alert('クリップボードにコピーしました！\nメモアプリ等に貼り付けて保存してください。');
+  } catch {
+    // clipboard API が使えない場合はテキストエリアで選択
+    const ta = document.createElement('textarea');
+    ta.value = json;
+    ta.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:80%;height:120px;z-index:9999;font-size:12px;padding:8px';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    alert('テキストを全選択してコピーしてください。');
+    ta.addEventListener('blur', () => ta.remove());
   }
-  // fallback: ダウンロード
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
-  a.download = 'cheki-tickets-backup.json';
-  a.click();
 }
 
-function importData(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      const d = JSON.parse(ev.target.result);
-      if (!Array.isArray(d.tickets)) throw new Error();
-      if (!confirm(`チケット${d.tickets.length}件のデータを読み込みます。現在のデータは上書きされます。よろしいですか？`)) return;
-      save(d.tickets);
-      if (Array.isArray(d.groups)) saveGroups(d.groups);
-      if (Array.isArray(d.types))  saveTypes(d.types);
-      alert('読み込み完了しました！');
-      closeSettings();
-    } catch { alert('ファイルが正しくありません'); }
-  };
-  reader.readAsText(file);
-  e.target.value = '';
+function showImport() {
+  const area = document.getElementById('import-area');
+  if (area) { area.style.display = area.style.display === 'none' ? 'block' : 'none'; }
+}
+
+function importData() {
+  const text = (document.getElementById('import-text')?.value || '').trim();
+  if (!text) { alert('データを貼り付けてください'); return; }
+  try {
+    const d = JSON.parse(text);
+    if (!Array.isArray(d.tickets)) throw new Error();
+    if (!confirm(`チケット${d.tickets.length}件のデータを復元します。現在のデータは上書きされます。よろしいですか？`)) return;
+    save(d.tickets);
+    if (Array.isArray(d.groups)) saveGroups(d.groups);
+    if (Array.isArray(d.types))  saveTypes(d.types);
+    alert('復元しました！');
+    closeSettings();
+  } catch { alert('データの形式が正しくありません'); }
 }
 
 function buildSettingsSection(lt, label, items) {
