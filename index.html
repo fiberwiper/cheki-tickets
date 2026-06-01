@@ -499,6 +499,7 @@ function bgCloseSettings(e) { if (e.target === document.getElementById('settings
 
 function renderSettings() {
   document.getElementById('settings-body').innerHTML =
+    buildBackupSection() +
     buildSettingsSection('groups', 'グループ', loadGroups()) +
     buildSettingsSection('types',  '種別',     loadTypes());
   // If editing, replace that row with input
@@ -518,6 +519,54 @@ function renderSettings() {
       if (inp) { inp.focus(); inp.select(); }
     }
   }
+}
+
+function buildBackupSection() {
+  return `
+    <div class="settings-section">
+      <h3>データのバックアップ</h3>
+      <p style="font-size:13px;color:#888;margin-bottom:12px;line-height:1.6">ホーム画面に追加し直すときは、先にエクスポートしてください。追加後にインポートすればデータが戻ります。</p>
+      <div style="display:flex;gap:8px">
+        <button onclick="exportData()" style="flex:1;background:#f2f2f7;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;color:#333">書き出す</button>
+        <label style="flex:1;background:var(--primary);border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;color:#fff;text-align:center;display:block">
+          読み込む
+          <input type="file" accept=".json" onchange="importData(event)" style="display:none">
+        </label>
+      </div>
+    </div>`;
+}
+
+function exportData() {
+  const payload = {
+    tickets: load(),
+    groups:  loadGroups(),
+    types:   loadTypes()
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'cheki-tickets-backup.json';
+  a.click();
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const d = JSON.parse(ev.target.result);
+      if (!Array.isArray(d.tickets)) throw new Error();
+      if (!confirm(`チケット${d.tickets.length}件のデータを読み込みます。現在のデータは上書きされます。よろしいですか？`)) return;
+      save(d.tickets);
+      if (Array.isArray(d.groups)) saveGroups(d.groups);
+      if (Array.isArray(d.types))  saveTypes(d.types);
+      alert('読み込み完了しました！');
+      closeSettings();
+    } catch { alert('ファイルが正しくありません'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
 }
 
 function buildSettingsSection(lt, label, items) {
